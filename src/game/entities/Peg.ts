@@ -1,13 +1,9 @@
 import Phaser from 'phaser';
 import { PEG_RADIUS } from '../constants';
-import type { PegSpawn, Team } from '../../types/game';
+import { getSideProfile } from '../teamConfig';
+import type { PegSpawn, Side } from '../../types/game';
 
 export class Peg {
-  private static readonly TEXTURE_KEYS: Record<Team, string> = {
-    player: 'peg-player',
-    ai: 'peg-ai',
-  };
-
   private readonly sprite: Phaser.Physics.Matter.Image;
   private readonly shadow: Phaser.GameObjects.Ellipse;
   private readonly home: Phaser.Math.Vector2;
@@ -16,7 +12,7 @@ export class Peg {
     private readonly scene: Phaser.Scene,
     spawn: PegSpawn,
   ) {
-    Peg.ensureTexture(scene, spawn.team);
+    const textureKey = Peg.ensureTexture(scene, spawn.side);
 
     this.home = new Phaser.Math.Vector2(spawn.x, spawn.y);
     this.shadow = scene.add
@@ -33,7 +29,7 @@ export class Peg {
     this.sprite = scene.matter.add.image(
       spawn.x,
       spawn.y,
-      Peg.TEXTURE_KEYS[spawn.team],
+      textureKey,
       undefined,
       {
         isStatic: true,
@@ -45,15 +41,20 @@ export class Peg {
     this.sprite.setIgnoreGravity(true);
 
     const body = this.sprite.body as MatterJS.BodyType;
-    body.label = `peg-${spawn.team}`;
+    body.label = `peg-${spawn.side}`;
   }
 
-  private static ensureTexture(scene: Phaser.Scene, team: Team) {
-    const textureKey = Peg.TEXTURE_KEYS[team];
+  private static getTextureKey(side: Side) {
+    return `peg-${side}-${getSideProfile(side).id}`;
+  }
+
+  private static ensureTexture(scene: Phaser.Scene, side: Side) {
+    const textureKey = Peg.getTextureKey(side);
     if (scene.textures.exists(textureKey)) {
-      return;
+      return textureKey;
     }
 
+    const palette = getSideProfile(side).pegPalette;
     const size = PEG_RADIUS * 2 + 16;
     const bodyWidth = PEG_RADIUS * 1.18;
     const bodyHeight = PEG_RADIUS * 1.72;
@@ -61,20 +62,22 @@ export class Peg {
     const bodyY = size / 2 - bodyHeight / 2 + 1;
     const graphics = scene.add.graphics();
 
-    graphics.fillStyle(0xd9d3c1, 1);
+    graphics.fillStyle(palette.body, 1);
     graphics.fillRoundedRect(bodyX, bodyY + 3, bodyWidth, bodyHeight - 5, 4);
-    graphics.fillStyle(0xf7f2e3, 1);
+    graphics.fillStyle(palette.cap, 1);
     graphics.fillEllipse(size / 2, bodyY + 4, bodyWidth, PEG_RADIUS * 0.62);
-    graphics.fillStyle(0xfefcf4, 0.95);
+    graphics.fillStyle(palette.stripe, 0.95);
     graphics.fillRoundedRect(bodyX + 2, bodyY + 5, bodyWidth * 0.3, bodyHeight - 9, 3);
-    graphics.fillStyle(0xffffff, 0.72);
+    graphics.fillStyle(palette.shine, 0.72);
     graphics.fillEllipse(size / 2 - 2, bodyY + 2, bodyWidth * 0.55, PEG_RADIUS * 0.26);
-    graphics.lineStyle(1, 0xb3ab99, 0.75);
+    graphics.lineStyle(1, palette.outline, 0.75);
     graphics.strokeEllipse(size / 2, bodyY + 4, bodyWidth, PEG_RADIUS * 0.62);
-    graphics.lineStyle(1, 0xc4bcaa, 0.65);
+    graphics.lineStyle(1, palette.trim, 0.65);
     graphics.strokeRoundedRect(bodyX, bodyY + 3, bodyWidth, bodyHeight - 5, 4);
     graphics.generateTexture(textureKey, size, size);
     graphics.destroy();
+
+    return textureKey;
   }
 
   reset() {

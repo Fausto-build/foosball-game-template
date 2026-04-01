@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GOAL_TARGETS, LEFT_GOAL_SENSOR, RIGHT_GOAL_SENSOR } from '../constants';
-import type { Team, VectorLike } from '../../types/game';
+import type { Side, VectorLike } from '../../types/game';
 
 export class GoalSystem {
   private goalLocked = false;
@@ -33,7 +33,7 @@ export class GoalSystem {
     );
   }
 
-  update(ballPosition: VectorLike): Team | null {
+  update(ballPosition: VectorLike): Side | null {
     if (this.goalLocked) {
       return null;
     }
@@ -51,8 +51,8 @@ export class GoalSystem {
     return null;
   }
 
-  getGoalTarget(team: Team) {
-    return GOAL_TARGETS[team].clone();
+  getGoalTarget(side: Side) {
+    return GOAL_TARGETS[side].clone();
   }
 
   reset() {

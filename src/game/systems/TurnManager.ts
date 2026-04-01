@@ -1,17 +1,20 @@
 import Phaser from 'phaser';
 import {
-  AI_KICKOFF_MESSAGE,
   AI_THINK_TIME_MS,
-  AI_TURN_MESSAGE,
   GOAL_RESET_DELAY_MS,
   GOAL_TARGETS,
   LONG_SHOT_DISTANCE,
   MAX_MATCH_SCORE,
-  PLAYER_KICKOFF_MESSAGE,
-  PLAYER_TURN_MESSAGE,
 } from '../constants';
+import {
+  getGameOverStatusMessage,
+  getGoalScoredMessage,
+  getKickoffMessage,
+  getShotMovingMessage,
+  getTurnPromptMessage,
+} from '../teamConfig';
 import { useGameStore } from '../../state/gameStore';
-import type { ShotTelemetry, Team } from '../../types/game';
+import type { ShotTelemetry, Side } from '../../types/game';
 
 interface TurnManagerOptions {
   onRequestAiShot: () => void;
@@ -47,7 +50,7 @@ export class TurnManager {
     });
   }
 
-  beginPlayerTurn(message = PLAYER_TURN_MESSAGE) {
+  beginPlayerTurn(message = getTurnPromptMessage('player')) {
     const store = useGameStore.getState();
     store.setTurn('player');
     store.setPhase('player_turn');
@@ -77,18 +80,16 @@ export class TurnManager {
 
     const store = useGameStore.getState();
     store.setPhase('player_turn');
-    store.setStatusText(PLAYER_TURN_MESSAGE);
+    store.setStatusText(getTurnPromptMessage('player'));
   }
 
-  onShotLaunched(shooter: Team) {
+  onShotLaunched(shooter: Side) {
     this.goalLocked = false;
 
     const store = useGameStore.getState();
     store.setTurn(shooter);
     store.setPhase(shooter === 'player' ? 'ball_moving' : 'ai_moving');
-    store.setStatusText(
-      shooter === 'player' ? 'Pelota en juego…' : 'Disparo de la computadora en movimiento.',
-    );
+    store.setStatusText(getShotMovingMessage(shooter));
   }
 
   onBallSettled() {
@@ -104,7 +105,7 @@ export class TurnManager {
     this.beginPlayerTurn();
   }
 
-  beginAiThinking(message = AI_TURN_MESSAGE) {
+  beginAiThinking(message = getTurnPromptMessage('ai')) {
     this.clearAiTimer();
 
     const store = useGameStore.getState();
@@ -119,7 +120,7 @@ export class TurnManager {
     });
   }
 
-  onGoal(scoringTeam: Team, shot: ShotTelemetry | null) {
+  onGoal(scoringSide: Side, shot: ShotTelemetry | null) {
     if (this.goalLocked) {
       return;
     }
@@ -130,10 +131,10 @@ export class TurnManager {
     const store = useGameStore.getState();
     const nextScore = {
       ...store.score,
-      [scoringTeam]: store.score[scoringTeam] + 1,
+      [scoringSide]: store.score[scoringSide] + 1,
     };
-    const isMatchWinner = nextScore[scoringTeam] >= MAX_MATCH_SCORE;
-    const styleResult = this.calculateStyle(scoringTeam, shot, isMatchWinner);
+    const isMatchWinner = nextScore[scoringSide] >= MAX_MATCH_SCORE;
+    const styleResult = this.calculateStyle(scoringSide, shot, isMatchWinner);
 
     store.setScore(nextScore);
 
@@ -148,34 +149,26 @@ export class TurnManager {
     }
 
     if (isMatchWinner) {
-      store.setWinner(scoringTeam);
+      store.setWinner(scoringSide);
       store.setPhase('game_over');
-      store.setStatusText(
-        scoringTeam === 'player'
-          ? 'Final del partido: ganaste el encuentro.'
-          : 'Final del partido: la IA Bronce se lo lleva.',
-      );
+      store.setStatusText(getGameOverStatusMessage(scoringSide));
       return;
     }
 
     store.setPhase('goal_scored');
-    store.setStatusText(
-      scoringTeam === 'player'
-        ? 'Gol tuyo. Rearmando la mesa…'
-        : 'Gol de la IA Bronce. Rearmando la mesa…',
-    );
+    store.setStatusText(getGoalScoredMessage(scoringSide));
 
-    const nextTurn: Team = scoringTeam === 'player' ? 'ai' : 'player';
+    const nextTurn: Side = scoringSide === 'player' ? 'ai' : 'player';
     this.resetTimer = this.scene.time.delayedCall(GOAL_RESET_DELAY_MS, () => {
       this.goalLocked = false;
       this.options.onResetBoard();
 
       if (nextTurn === 'player') {
-        this.beginPlayerTurn(PLAYER_KICKOFF_MESSAGE);
+        this.beginPlayerTurn(getKickoffMessage('player'));
         return;
       }
 
-      this.beginAiThinking(AI_KICKOFF_MESSAGE);
+      this.beginAiThinking(getKickoffMessage('ai'));
     });
   }
 
@@ -197,7 +190,7 @@ export class TurnManager {
   }
 
   private calculateStyle(
-    scoringTeam: Team,
+    scoringSide: Side,
     shot: ShotTelemetry | null,
     isMatchWinner: boolean,
   ): StyleResult {
@@ -205,7 +198,7 @@ export class TurnManager {
     const labels: string[] = [];
 
     if (shot) {
-      const goalTarget = GOAL_TARGETS[scoringTeam];
+      const goalTarget = GOAL_TARGETS[scoringSide];
       const distance = Phaser.Math.Distance.Between(
         shot.start.x,
         shot.start.y,

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { PegSpawn, Team } from '../types/game';
+import type { PegSpawn, Side } from '../types/game';
 
 export const SCENE_WIDTH = 1080;
 export const SCENE_HEIGHT = 620;
@@ -83,16 +83,16 @@ function toPitchY(yRatio: number) {
   return PITCH_BOUNDS.y + PITCH_BOUNDS.height * yRatio;
 }
 
-function buildFormation(team: Team): PegSpawn[] {
+function buildFormation(side: Side): PegSpawn[] {
   const spawns: PegSpawn[] = [];
 
   PLAYER_FORMATION_LAYOUT.forEach((lane) => {
     lane.yRatios.forEach((yRatio, index) => {
-      const xRatio = team === 'player' ? lane.xRatio : 1 - lane.xRatio;
+      const xRatio = side === 'player' ? lane.xRatio : 1 - lane.xRatio;
 
       spawns.push({
-        id: `${team}-peg-${lane.key}-${index}`,
-        team,
+        id: `${side}-peg-${lane.key}-${index}`,
+        side,
         x: toPitchX(xRatio),
         y: toPitchY(yRatio),
       });
@@ -131,7 +131,7 @@ export const GOAL_TARGETS = {
     RIGHT_GOAL_SENSOR.centerY,
   ),
   ai: new Phaser.Math.Vector2(LEFT_GOAL_SENSOR.centerX, LEFT_GOAL_SENSOR.centerY),
-};
+} as const satisfies Record<Side, Phaser.Math.Vector2>;
 
 export const AI_ANGLE_OFFSETS = [
   -0.55,
@@ -148,8 +148,3 @@ export const AI_ANGLE_OFFSETS = [
 ];
 
 export const AI_CANDIDATE_POWERS = [8.1, 9.1, 10.3, 11.2, 12.1];
-
-export const PLAYER_TURN_MESSAGE = 'Tu turno: patea la pelota.';
-export const AI_TURN_MESSAGE = 'Turno de la computadora: la IA Bronce está pensando.';
-export const PLAYER_KICKOFF_MESSAGE = 'Saque reiniciado: es tu turno.';
-export const AI_KICKOFF_MESSAGE = 'Saque reiniciado: saca la computadora.';

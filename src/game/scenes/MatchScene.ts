@@ -3,6 +3,7 @@ import { GAME_EVENTS, gameEvents } from '../FoosballGame';
 import { webAudioSfx } from '../audio/WebAudioSfx';
 import { Ball } from '../entities/Ball';
 import { Peg } from '../entities/Peg';
+import { getSideGoalHighlight } from '../teamConfig';
 import {
   AI_PEGS,
   BALL_KICKOFF_POSITION,
@@ -17,7 +18,7 @@ import {
   WALL_THICKNESS,
 } from '../constants';
 import { useGameStore } from '../../state/gameStore';
-import type { ShotTelemetry, Team } from '../../types/game';
+import type { ShotTelemetry, Side } from '../../types/game';
 import { AISystem } from '../systems/AISystem';
 import { GoalSystem } from '../systems/GoalSystem';
 import { InputSystem } from '../systems/InputSystem';
@@ -147,7 +148,7 @@ export class MatchScene extends Phaser.Scene {
     this.ball.destroy();
   }
 
-  private launchBall(velocity: Phaser.Math.Vector2, shooter: Team) {
+  private launchBall(velocity: Phaser.Math.Vector2, shooter: Side) {
     this.goalSystem.reset();
     this.settleElapsedMs = 0;
     this.currentShot = {
@@ -427,7 +428,7 @@ export class MatchScene extends Phaser.Scene {
     const rightGoalX = PITCH_BOUNDS.x + PITCH_BOUNDS.width;
 
     this.leftGoalHighlight = this.add
-      .rectangle(leftGoalX + GOAL_DEPTH / 2, GOAL_CENTER_Y, GOAL_DEPTH, goalHeight, 0x23c552, 0)
+      .rectangle(leftGoalX + GOAL_DEPTH / 2, GOAL_CENTER_Y, GOAL_DEPTH, goalHeight, 0xffffff, 0)
       .setDepth(1);
     this.rightGoalHighlight = this.add
       .rectangle(
@@ -435,7 +436,7 @@ export class MatchScene extends Phaser.Scene {
         GOAL_CENTER_Y,
         GOAL_DEPTH,
         goalHeight,
-        0x23c552,
+        0xffffff,
         0,
       )
       .setDepth(1);
@@ -472,11 +473,11 @@ export class MatchScene extends Phaser.Scene {
     this.rightGoalHighlight.setAlpha(0);
   }
 
-  private showGoalHighlight(scoringTeam: Team) {
+  private showGoalHighlight(scoringSide: Side) {
     this.clearGoalHighlights();
 
-    const highlight = scoringTeam === 'player' ? this.rightGoalHighlight : this.leftGoalHighlight;
-    const color = scoringTeam === 'player' ? 0x23c552 : 0xd63a3a;
+    const highlight = scoringSide === 'player' ? this.rightGoalHighlight : this.leftGoalHighlight;
+    const color = getSideGoalHighlight(scoringSide);
 
     highlight.setFillStyle(color, 1);
     this.tweens.add({

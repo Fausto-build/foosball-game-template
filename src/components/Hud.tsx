@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+import { getSideHudLabel, getSideHudPalette } from '../game/teamConfig';
 import { useGameStore } from '../state/gameStore';
 
 export function Hud() {
@@ -6,11 +8,23 @@ export function Hud() {
   const stylePoints = useGameStore((state) => state.stylePoints);
   const styleMessage =
     stylePoints > 0 ? `+ ${stylePoints} estilo` : '0 estilo';
+  const playerHudPalette = getSideHudPalette('player');
+  const aiHudPalette = getSideHudPalette('ai');
+  const playerHudStyle: CSSProperties = {
+    background: playerHudPalette.background,
+    color: playerHudPalette.text,
+  };
+  const aiHudStyle: CSSProperties = {
+    background: aiHudPalette.background,
+    color: aiHudPalette.text,
+  };
 
   return (
     <header className="hud">
       <section className="hud-side hud-side--left">
-        <span className="hud-pill hud-pill--player">TÚ</span>
+        <span className="hud-pill hud-pill--player" style={playerHudStyle}>
+          {getSideHudLabel('player')}
+        </span>
         <strong className="hud-score">{score.player}</strong>
       </section>
 
@@ -29,7 +43,9 @@ export function Hud() {
         </button>
         <div className="hud-opponent">
           <strong className="hud-score">{score.ai}</strong>
-          <span className="hud-pill hud-pill--ai">IA BRONCE</span>
+          <span className="hud-pill hud-pill--ai" style={aiHudStyle}>
+            {getSideHudLabel('ai')}
+          </span>
         </div>
       </section>
     </header>

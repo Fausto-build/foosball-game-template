@@ -1,22 +1,22 @@
 import { create } from 'zustand';
-import type { GamePhase, ScoreState, Team } from '../types/game';
+import type { GamePhase, ScoreState, Side } from '../types/game';
 
 interface GameStore {
   score: ScoreState;
-  turn: Team;
+  turn: Side;
   phase: GamePhase;
   statusText: string;
   stylePoints: number;
   styleMessage: string;
-  winner: Team | null;
+  winner: Side | null;
   muted: boolean;
-  setTurn: (turn: Team) => void;
+  setTurn: (turn: Side) => void;
   setPhase: (phase: GamePhase) => void;
   setStatusText: (statusText: string) => void;
   setScore: (score: ScoreState) => void;
   awardStyle: (delta: number, label: string) => void;
   setStyleMessage: (styleMessage: string) => void;
-  setWinner: (winner: Team | null) => void;
+  setWinner: (winner: Side | null) => void;
   toggleMuted: () => void;
   resetMatch: () => void;
 }

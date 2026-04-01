@@ -1,4 +1,4 @@
-import type { Team } from '../../types/game';
+import type { Side } from '../../types/game';
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -57,7 +57,7 @@ class WebAudioSfx {
     });
   }
 
-  playGoal(scoringTeam: Team) {
+  playGoal(scoringTeam: Side) {
     const context = this.prepareContext();
     if (!context || this.muted) {
       return;

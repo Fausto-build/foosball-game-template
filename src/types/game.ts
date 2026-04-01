@@ -1,4 +1,5 @@
-export type Team = 'player' | 'ai';
+export type Side = 'player' | 'ai';
+export type Team = Side;
 
 export type GamePhase =
   | 'loading'
@@ -23,13 +24,13 @@ export interface VectorLike {
 
 export interface PegSpawn {
   id: string;
-  team: Team;
+  side: Side;
   x: number;
   y: number;
 }
 
 export interface ShotTelemetry {
-  shooter: Team;
+  shooter: Side;
   start: VectorLike;
   wallBounces: number;
   pegHits: number;

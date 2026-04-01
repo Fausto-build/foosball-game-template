@@ -4,6 +4,10 @@ import { GameCanvas } from './GameCanvas';
 import { Hud } from './Hud';
 import { GAME_EVENTS, gameEvents } from '../game/FoosballGame';
 import { webAudioSfx } from '../game/audio/WebAudioSfx';
+import {
+  getSideDisplayName,
+  getWinnerOverlayMessage,
+} from '../game/teamConfig';
 import { useGameStore } from '../state/gameStore';
 
 export function GameShell() {
@@ -21,8 +25,7 @@ export function GameShell() {
     gameEvents.emit(GAME_EVENTS.NEW_GAME);
   }
 
-  const winnerLabel =
-    winner === 'player' ? 'Ganaste el partido.' : winner === 'ai' ? 'La IA Bronce se lleva el partido.' : null;
+  const winnerLabel = winner ? getWinnerOverlayMessage(winner) : null;
 
   return (
     <main className="app-shell">
@@ -48,8 +51,8 @@ export function GameShell() {
                 <span className="board-overlay__eyebrow">Final del partido</span>
                 <h2 className="board-overlay__title">{winnerLabel}</h2>
                 <p className="board-overlay__body">
-                  Marcador final {score.player} - {score.ai}. Presiona Nuevo juego para rearmar la
-                  mesa.
+                  Marcador final {getSideDisplayName('player')} {score.player} - {score.ai}{' '}
+                  {getSideDisplayName('ai')}. Presiona Nuevo juego para rearmar la mesa.
                 </p>
               </div>
             ) : null}
