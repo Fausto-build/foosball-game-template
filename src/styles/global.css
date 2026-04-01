@@ -304,20 +304,23 @@ button {
   background: transparent;
 }
 
-.control-button--share {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: #090909;
-}
-
 .control-icon-button {
-  min-width: 84px;
-  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  width: 44px;
+  padding: 0;
   color: #8b8b8b;
   background: transparent;
   transition:
     color 160ms ease,
     border-color 160ms ease,
     background 160ms ease;
+}
+
+.control-icon-button svg {
+  display: block;
 }
 
 .control-icon-button[aria-pressed='true'] {

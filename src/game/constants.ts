@@ -149,7 +149,7 @@ export const AI_ANGLE_OFFSETS = [
 
 export const AI_CANDIDATE_POWERS = [8.1, 9.1, 10.3, 11.2, 12.1];
 
-export const PLAYER_TURN_MESSAGE = 'Your turn — flick the ball!';
-export const AI_TURN_MESSAGE = 'Computer turn — Bronze AI is thinking.';
-export const PLAYER_KICKOFF_MESSAGE = 'Kickoff reset — your turn.';
-export const AI_KICKOFF_MESSAGE = 'Kickoff reset — computer serves.';
+export const PLAYER_TURN_MESSAGE = 'Tu turno: patea la pelota.';
+export const AI_TURN_MESSAGE = 'Turno de la computadora: la IA Bronce está pensando.';
+export const PLAYER_KICKOFF_MESSAGE = 'Saque reiniciado: es tu turno.';
+export const AI_KICKOFF_MESSAGE = 'Saque reiniciado: saca la computadora.';

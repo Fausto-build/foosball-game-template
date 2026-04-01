@@ -29,5 +29,5 @@ export function GameCanvas() {
     };
   }, []);
 
-  return <div ref={containerRef} className="game-canvas" aria-label="Flick Foosball board" />;
+  return <div ref={containerRef} className="game-canvas" aria-label="Mesa de fútbol de mesa" />;
 }

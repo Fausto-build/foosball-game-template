@@ -26,13 +26,13 @@ const INITIAL_SCORE: ScoreState = {
   ai: 0,
 };
 
-const defaultStyleMessage = 'Click near the ball · drag back · release to flick';
+const defaultStyleMessage = 'Haz clic cerca de la pelota · arrastra hacia atrás · suelta para patear';
 
 export const useGameStore = create<GameStore>((set, get) => ({
   score: INITIAL_SCORE,
   turn: 'player',
   phase: 'loading',
-  statusText: 'Loading match…',
+  statusText: 'Cargando partido…',
   stylePoints: 0,
   styleMessage: defaultStyleMessage,
   winner: null,
@@ -44,7 +44,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   awardStyle: (delta, label) =>
     set({
       stylePoints: get().stylePoints + delta,
-      styleMessage: `+ ${delta} style · ${label}`,
+      styleMessage: `+ ${delta} estilo · ${label}`,
     }),
   setStyleMessage: (styleMessage) => set({ styleMessage }),
   setWinner: (winner) => set({ winner }),
@@ -54,7 +54,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       score: INITIAL_SCORE,
       turn: 'player',
       phase: 'loading',
-      statusText: 'Re-racking the board…',
+      statusText: 'Rearmando la mesa…',
       stylePoints: 0,
       styleMessage: defaultStyleMessage,
       winner: null,

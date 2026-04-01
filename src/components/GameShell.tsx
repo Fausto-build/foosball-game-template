@@ -12,7 +12,6 @@ export function GameShell() {
   const score = useGameStore((state) => state.score);
   const winner = useGameStore((state) => state.winner);
   const toggleMuted = useGameStore((state) => state.toggleMuted);
-  const setStatusText = useGameStore((state) => state.setStatusText);
 
   useEffect(() => {
     webAudioSfx.setMuted(muted);
@@ -22,27 +21,8 @@ export function GameShell() {
     gameEvents.emit(GAME_EVENTS.NEW_GAME);
   }
 
-  async function handleShare() {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Flick Foosball',
-          text: 'See if you can beat my Bronze AI match.',
-          url: window.location.href,
-        });
-        setStatusText('Match shared from the sidelines.');
-        return;
-      }
-
-      await navigator.clipboard.writeText(window.location.href);
-      setStatusText('Link copied. Throw down the challenge.');
-    } catch {
-      setStatusText('Share cancelled. The table stays local.');
-    }
-  }
-
   const winnerLabel =
-    winner === 'player' ? 'You win the board.' : winner === 'ai' ? 'Bronze AI steals the match.' : null;
+    winner === 'player' ? 'Ganaste el partido.' : winner === 'ai' ? 'La IA Bronce se lleva el partido.' : null;
 
   return (
     <main className="app-shell">
@@ -58,29 +38,25 @@ export function GameShell() {
 
             {phase === 'loading' ? (
               <div className="board-overlay board-overlay--soft">
-                <span className="board-overlay__eyebrow">Setting the table</span>
-                <p className="board-overlay__body">Generating the pitch and rack positions…</p>
+                <span className="board-overlay__eyebrow">Preparando la mesa</span>
+                <p className="board-overlay__body">Generando la cancha y la posición inicial…</p>
               </div>
             ) : null}
 
             {winnerLabel ? (
               <div className="board-overlay">
-                <span className="board-overlay__eyebrow">Full time</span>
+                <span className="board-overlay__eyebrow">Final del partido</span>
                 <h2 className="board-overlay__title">{winnerLabel}</h2>
                 <p className="board-overlay__body">
-                  Final score {score.player} - {score.ai}. Press New Game to re-rack the table.
+                  Marcador final {score.player} - {score.ai}. Presiona Nuevo juego para rearmar la
+                  mesa.
                 </p>
               </div>
             ) : null}
           </div>
         </section>
 
-        <BottomControls
-          muted={muted}
-          onNewGame={handleNewGame}
-          onShare={handleShare}
-          onToggleSound={toggleMuted}
-        />
+        <BottomControls muted={muted} onNewGame={handleNewGame} onToggleSound={toggleMuted} />
       </div>
     </main>
   );

@@ -44,7 +44,7 @@ export class MatchScene extends Phaser.Scene {
   create() {
     const store = useGameStore.getState();
     store.setPhase('loading');
-    store.setStatusText('Lighting the table…');
+    store.setStatusText('Preparando la mesa…');
 
     this.cameras.main.setBackgroundColor('#d7d7d7');
     this.drawBoard();

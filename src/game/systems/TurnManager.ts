@@ -55,8 +55,8 @@ export class TurnManager {
     store.setStatusText(message);
     store.setStyleMessage(
       store.stylePoints > 0
-        ? `Style bank ${store.stylePoints}`
-        : 'Click near the ball · drag back · release to flick',
+        ? `Estilo acumulado: ${store.stylePoints}`
+        : 'Haz clic cerca de la pelota · arrastra hacia atrás · suelta para patear',
     );
   }
 
@@ -67,7 +67,7 @@ export class TurnManager {
 
     const store = useGameStore.getState();
     store.setPhase('aiming');
-    store.setStatusText('Pick your line and release.');
+    store.setStatusText('Alinea el tiro y suelta.');
   }
 
   cancelAiming() {
@@ -86,7 +86,9 @@ export class TurnManager {
     const store = useGameStore.getState();
     store.setTurn(shooter);
     store.setPhase(shooter === 'player' ? 'ball_moving' : 'ai_moving');
-    store.setStatusText(shooter === 'player' ? 'Ball in play…' : 'Computer shot in motion.');
+    store.setStatusText(
+      shooter === 'player' ? 'Pelota en juego…' : 'Disparo de la computadora en movimiento.',
+    );
   }
 
   onBallSettled() {
@@ -139,7 +141,9 @@ export class TurnManager {
       store.awardStyle(styleResult.delta, styleResult.label);
     } else {
       store.setStyleMessage(
-        store.stylePoints > 0 ? `Style bank ${store.stylePoints}` : 'Clean finish. No style bonus.',
+        store.stylePoints > 0
+          ? `Estilo acumulado: ${store.stylePoints}`
+          : 'Definición limpia. Sin bono de estilo.',
       );
     }
 
@@ -148,8 +152,8 @@ export class TurnManager {
       store.setPhase('game_over');
       store.setStatusText(
         scoringTeam === 'player'
-          ? 'Full time — you win the match.'
-          : 'Full time — Bronze AI takes it.',
+          ? 'Final del partido: ganaste el encuentro.'
+          : 'Final del partido: la IA Bronce se lo lleva.',
       );
       return;
     }
@@ -157,8 +161,8 @@ export class TurnManager {
     store.setPhase('goal_scored');
     store.setStatusText(
       scoringTeam === 'player'
-        ? 'You score! Re-racking the table…'
-        : 'Bronze AI scores! Re-racking the table…',
+        ? 'Gol tuyo. Rearmando la mesa…'
+        : 'Gol de la IA Bronce. Rearmando la mesa…',
     );
 
     const nextTurn: Team = scoringTeam === 'player' ? 'ai' : 'player';
@@ -211,33 +215,33 @@ export class TurnManager {
 
       if (shot.wallBounces > 0) {
         delta += 10;
-        labels.push('banked finish');
+        labels.push('gol con rebote');
       }
 
       if (distance >= LONG_SHOT_DISTANCE) {
         delta += 5;
-        labels.push('long-range');
+        labels.push('larga distancia');
       }
 
       if (shot.pegHits >= 2) {
         delta += 10;
-        labels.push('threaded traffic');
+        labels.push('entre el tráfico');
       }
 
       if (shot.maxSpeed >= 11.4) {
         delta += 5;
-        labels.push('hammer strike');
+        labels.push('disparo potente');
       }
     }
 
     if (isMatchWinner) {
       delta += 25;
-      labels.push('match winner');
+      labels.push('gol decisivo');
     }
 
     return {
       delta,
-      label: labels.length > 0 ? labels.slice(0, 2).join(' · ') : 'sharp finish',
+      label: labels.length > 0 ? labels.slice(0, 2).join(' · ') : 'definición precisa',
     };
   }
 }
