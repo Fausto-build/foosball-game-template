@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { BottomControls } from './BottomControls';
 import { GameCanvas } from './GameCanvas';
 import { Hud } from './Hud';
 import { GAME_EVENTS, gameEvents } from '../game/FoosballGame';
+import { webAudioSfx } from '../game/audio/WebAudioSfx';
 import { useGameStore } from '../state/gameStore';
 
 export function GameShell() {
@@ -11,6 +13,10 @@ export function GameShell() {
   const winner = useGameStore((state) => state.winner);
   const toggleMuted = useGameStore((state) => state.toggleMuted);
   const setStatusText = useGameStore((state) => state.setStatusText);
+
+  useEffect(() => {
+    webAudioSfx.setMuted(muted);
+  }, [muted]);
 
   function handleNewGame() {
     gameEvents.emit(GAME_EVENTS.NEW_GAME);

@@ -29,8 +29,14 @@ export function BottomControls({
         Click near the ball · drag back · release to flick
       </p>
 
-      <button type="button" className="control-icon-button" onClick={onToggleSound}>
-        {muted ? 'SFX' : 'SFX'}
+      <button
+        type="button"
+        className="control-icon-button"
+        onClick={onToggleSound}
+        aria-pressed={!muted}
+        aria-label={muted ? 'Enable sound effects' : 'Mute sound effects'}
+      >
+        {muted ? 'SFX Off' : 'SFX On'}
       </button>
     </footer>
   );

@@ -310,10 +310,24 @@ button {
 }
 
 .control-icon-button {
-  min-width: 42px;
+  min-width: 84px;
   padding: 0 12px;
   color: #8b8b8b;
   background: transparent;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.control-icon-button[aria-pressed='true'] {
+  color: #f3f1e7;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(70, 70, 70, 0.95), rgba(33, 33, 33, 0.95));
+}
+
+.control-icon-button[aria-pressed='false'] {
+  color: #727272;
 }
 
 .control-button:disabled,

@@ -44,28 +44,57 @@ export const GOAL_CENTER_Y = PITCH_BOUNDS.y + PITCH_BOUNDS.height / 2;
 export const GOAL_OPEN_TOP = GOAL_CENTER_Y - GOAL_WIDTH / 2;
 export const GOAL_OPEN_BOTTOM = GOAL_CENTER_Y + GOAL_WIDTH / 2;
 
-const PLAYER_ROW_LAYOUT = [
-  { x: 88, ys: [78, 168, 280, 370] },
-  { x: 206, ys: [112, 224, 336] },
-  { x: 324, ys: [160, 288] },
-  { x: 426, ys: [224] },
-] as const;
+interface FormationLane {
+  key: string;
+  xRatio: number;
+  yRatios: readonly number[];
+}
+
+// Update these ratios to quickly tune the board setup.
+// `xRatio` is relative to pitch width, `yRatios` are relative to pitch height.
+export const PLAYER_FORMATION_LAYOUT = [
+  {
+    key: 'back-line',
+    xRatio: 0.11,
+    yRatios: [0.31, 0.46, 0.58, 0.72],
+  },
+  {
+    key: 'support-pocket',
+    xRatio: 0.215,
+    yRatios: [0.50],
+  },
+  {
+    key: 'mid-line',
+    xRatio: 0.325,
+    yRatios: [0.33, 0.47, 0.58, 0.70],
+  },
+  {
+    key: 'striker',
+    xRatio: 0.445,
+    yRatios: [0.50],
+  },
+] as const satisfies readonly FormationLane[];
+
+function toPitchX(xRatio: number) {
+  return PITCH_BOUNDS.x + PITCH_BOUNDS.width * xRatio;
+}
+
+function toPitchY(yRatio: number) {
+  return PITCH_BOUNDS.y + PITCH_BOUNDS.height * yRatio;
+}
 
 function buildFormation(team: Team): PegSpawn[] {
   const spawns: PegSpawn[] = [];
 
-  PLAYER_ROW_LAYOUT.forEach((row, rowIndex) => {
-    row.ys.forEach((y, index) => {
-      const x =
-        team === 'player'
-          ? PITCH_BOUNDS.x + row.x
-          : PITCH_BOUNDS.x + PITCH_BOUNDS.width - row.x;
+  PLAYER_FORMATION_LAYOUT.forEach((lane) => {
+    lane.yRatios.forEach((yRatio, index) => {
+      const xRatio = team === 'player' ? lane.xRatio : 1 - lane.xRatio;
 
       spawns.push({
-        id: `${team}-peg-${rowIndex}-${index}`,
+        id: `${team}-peg-${lane.key}-${index}`,
         team,
-        x,
-        y: PITCH_BOUNDS.y + y,
+        x: toPitchX(xRatio),
+        y: toPitchY(yRatio),
       });
     });
   });

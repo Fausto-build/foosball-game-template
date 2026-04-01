@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_EVENTS, gameEvents } from '../FoosballGame';
+import { webAudioSfx } from '../audio/WebAudioSfx';
 import { Ball } from '../entities/Ball';
 import { Peg } from '../entities/Peg';
 import {
@@ -106,6 +107,7 @@ export class MatchScene extends Phaser.Scene {
 
     const scoringTeam = this.goalSystem.update(this.ball.getPosition());
     if (scoringTeam) {
+      webAudioSfx.playGoal(scoringTeam);
       this.showGoalHighlight(scoringTeam);
       this.turnManager.onGoal(scoringTeam, this.currentShot);
       return;
@@ -159,6 +161,7 @@ export class MatchScene extends Phaser.Scene {
       maxSpeed: velocity.length(),
     };
 
+    webAudioSfx.playShot(velocity.length() / 12);
     this.ball.launch(velocity);
     this.turnManager.onShotLaunched(shooter);
   }
